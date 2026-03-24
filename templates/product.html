@@ -20,8 +20,25 @@
         <img style="margin: 40px; width: 80px; height: 80px"
              src="{{ url_for('static', filename='images/Icon.png') }}">
         <h1 style="font-size: 72px">БашMAX</h1>
+            <a href="/orders" style="
+                    justify-content:right;
+                    text-align: center;
+                    height:20px;
+                    margin-left: 1950px;
+                    padding: 10px 15px;
+                    background-color: #4CAF50;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    width: 100px;
+                ">
+                Заказы
+            </a><br>
     </div>
+
+
     <div style="margin-top: -50px; text-align: right;">
+
         <a href="/logout" style="margin: 10px;
     font-size: 14px;
     justify-content:right;
@@ -30,6 +47,7 @@
         <p style="margin: 10px">Имя: {{name}}</p>
         <p style="margin: 10px">Роль: {{role}}</p>
     </div>
+
 </header>
 <main>
     {% if role == 'Администратор' or role == 'Менеджер' %}

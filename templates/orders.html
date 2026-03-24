@@ -13,30 +13,55 @@
     </div>
 </header>
 <main>
-    {% for p in items%}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:20px;">
+{% for p in items %}
+    <div style="display:flex; border:2px solid black; border-radius:15px; padding:10px; align-items:center;">
+        <div style="flex:1; padding-right:10px;">
+            <b>Заказ №{{ p['id'] }}</b><br>
+            Артикул: {{ p['artikul'] }}<br>
+            Статус: {{ p['status'] }}<br>
+            Адрес пункта выдачи: {{ p['pup_address'] }}<br>
+            Дата заказа: {{ p['order_date'][:10] }}<br>
+            Клиент: {{ p['fullname'] }}<br>
+            Код получения: {{ p['code'] }}<br>
+        </div>
+
+        <div style="width:150px; text-align:center; display:flex; align-items:center; justify-content:center;">
+            <p>Дата доставки:<br>{{ p['delivery_date'][:10] }}</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin-left:10px;">
+
+            {% if role == 'Администратор' or role == 'Менеджер' %}
+
+            <a href="/edit_order/{{ p['id'] }}" style="
+                text-align:center;
+                padding:10px 15px;
+                background-color:#4CAF50;
+                color:white;
+                text-decoration:none;
+                border-radius:5px;
+                width:100px;
+            ">Редактировать</a>
+        {% endif %}
+            {% if role == 'Администратор' %}
+            <form method="post" action="/delete_order/{{ p['id'] }}" onsubmit="return confirm('Удалить заказ?');">
+                <button type="submit" style="
+                    text-align:center;
+                    padding:10px 15px;
+                    background-color:#f44336;
+                    color:white;
+                    border:none;
+                    border-radius:5px;
+                    width:100px;
+                    cursor:pointer;
+                ">Удалить</button>
+            </form>
+            {% endif %}
+        </div>
     </div>
-            <div style="flex:1; padding:10px;">
-                <b>
-                    {{ highlight(p[4], searсh) }} | {{ highlight(p[2], search) }}<br>
-                    Описание товара: {{ highlight(p[5], search) }}<br>
-                    Производитель: {{highlight(p[6], search) }}<br>
-                    Поставшик: {{highlight(p[7], search)}}<br>
-                    Цена:
-                    {% if p[9] > 0 %}
-                    <span style="color: red; text-decoration: line-through">
-                        {{ highlight(p[8], search)}}
-                    </span>
-                    {{ p[8] * (1 - p[9]/100) }}
-                    {% else %}
-                    {{ p[8] }}
-                    {% endif %}<br>
-                    Единица измерения: {{p[3]}}<br>
-                    <p style="{{'color: blue' if p[10] == 0 else ''}}">Количество на складе: {{ highlight(p[10],
-                        search)}}</p>
-                </b>
-            </div>
-    </div>
-    {% endfor %}
+{% endfor %}
+</div>
 </main>
 
 </body>

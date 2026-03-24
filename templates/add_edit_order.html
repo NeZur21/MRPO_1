@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+    <div style="display: flex;">
+        <img style="margin: 40px; width: 80px; height: 80px"
+             src="{{ url_for('static', filename='images/Icon.png') }}">
+        <h1 style="font-size: 72px">БашMAX</h1>
+    </div>
+</header>
+<main>
+<h2>{{ 'Редактировать заказ' if order else 'Добавить заказ' }}</h2>
+<form method="post">
+    <label>Артикул:</label>
+    <input type="text" name="artikul" value="{{ order['artikul'] if order else '' }}"><br>
+
+    <label>Статус заказа:</label>
+    <select name="status">
+        {% for s in ['Новый', 'В обработке', 'Выполнен', 'Отменён'] %}
+            <option value="{{ s }}" {% if order and order['status']==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label>Адрес пункта выдачи:</label>
+    <input type="text" name="pup_address" value="{{ order['pup_address'] if order else '' }}"><br>
+
+    <label>Дата заказа:</label>
+    <input type="date" name="order_date" value="{{ order['order_date'][:10] if order else '' }}"><br>
+
+    <label>Дата доставки:</label>
+    <input type="date" name="delivery_date" value="{{ order['delivery_date'][:10] if order else '' }}"><br>
+
+    <label>ФИО клиента:</label>
+    <input type="text" name="fullname" value="{{ order['fullname'] if order else '' }}"><br>
+
+    <label>Код получения:</label>
+    <input type="text" name="code" value="{{ order['code'] if order else '' }}"><br>
+
+    <button type="submit">{{ 'Сохранить' if order else 'Добавить' }}</button>
+</form>
+</main>
+
+</body>
+</html>

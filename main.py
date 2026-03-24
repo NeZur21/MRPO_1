@@ -12,6 +12,7 @@ app.config['UPLOAD_FOLDER'] = os.path.join('static', 'images')
 DB_NAME = 'shop.db'
 
 
+
 def get_db():
     conn = sqlite3.connect(DB_NAME)
     conn.row_factory = sqlite3.Row
@@ -119,12 +120,14 @@ def seed_db():
             "Дата заказа": "order_date",
             "Дата доставки": "delivery_date",
             "Адрес пункта выдачи": "pup_address",
-            "ФИО авторизированного клиента": "full_name",
-            "Код для получения": 'code',
+            "ФИО авторизированного клиента": "fullname",
+            "Код для получения": "code",
             "Статус заказа": "status"
         })
 
-        df_renamed.to_sql('users', conn, index=False, if_exists='append')
+        df_renamed = df_renamed.drop(columns=['Номер заказа'], errors='ignore')
+
+        df_renamed.to_sql('orders', conn, index=False, if_exists='append')
     else:
         pass
 
@@ -346,13 +349,100 @@ def delete_product(product_id):
     return redirect('/products')
 
 
-@app.route('/products', methods=['POST'])
-def oreder():
+@app.route('/orders', methods=['POST', 'GET'])
+def order():
     conn = get_db()
     cursor = conn.cursor()
 
-    return render_template('orders.html')
+    cursor.execute("SELECT * FROM orders")
+    items = cursor.fetchall()
 
+    conn.close()
+
+    return render_template('orders.html', items=items, role=session.get('role'))
+
+@app.route('/add_order', methods=['GET', 'POST'])
+def add_order():
+    if session.get('role') != 'Администратор':
+        return 'Access Denied'
+
+    if request.method == 'POST':
+        artikul = request.form['artikul']
+        status = request.form['status']
+        pup_address = request.form['pup_address']
+        order_date = request.form['order_date']
+        delivery_date = request.form['delivery_date']
+        fullname = request.form['fullname']
+        code = request.form['code']
+
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO orders (artikul, status, pup_address, order_date, delivery_date, fullname, code)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (artikul, status, pup_address, order_date, delivery_date, fullname, code))
+        conn.commit()
+        conn.close()
+        return redirect('/orders')
+
+    return render_template('orders.html', items=None, role=session.get('role'))
+
+@app.route('/edit_order/<int:order_id>', methods=['GET', 'POST'])
+def edit_order(order_id):
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM orders WHERE id=?", (order_id,))
+    order = cursor.fetchone()
+
+    if request.method == 'POST':
+        artikul = request.form['artikul']
+        status = request.form['status']
+        pup_address = request.form['pup_address']
+        order_date = request.form['order_date']
+        delivery_date = request.form['delivery_date']
+        fullname = request.form['fullname']
+        code = request.form['code']
+
+        cursor.execute("""
+            UPDATE orders
+            SET artikul=?, status=?, pup_address=?, order_date=?, delivery_date=?, fullname=?, code=?
+            WHERE id=?
+        """, (artikul, status, pup_address, order_date, delivery_date, fullname, code, order_id))
+        conn.commit()
+        conn.close()
+        return redirect('/orders')
+
+    conn.close()
+    return render_template('add_edit_order.html', order=order)
+
+@app.route('/delete_product/<int:product_id>', methods=['POST'], endpoint='delete_product_safe')
+def delete_product(product_id):
+    if session.get('role') != 'Администратор':
+        return 'Access Denied'
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT artikul FROM products WHERE id=?", (product_id,))
+    row = cursor.fetchone()
+    if not row:
+        conn.close()
+        return 'Товар не найден'
+
+    artikul = row['artikul']
+
+    # Проверяем, есть ли этот артикул в заказах
+    cursor.execute("SELECT COUNT(*) FROM orders WHERE artikul=?", (artikul,))
+    count = cursor.fetchone()[0]
+
+    if count > 0:
+        conn.close()
+        return 'Невозможно удалить товар: он присутствует в заказах.'
+
+    # Если нет заказов, удаляем товар
+    cursor.execute("DELETE FROM products WHERE id=?", (product_id,))
+    conn.commit()
+    conn.close()
+    return redirect('/products')
 
 if __name__ == '__main__':
     init_db()
