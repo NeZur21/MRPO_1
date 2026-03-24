@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<header>
+    <div style="display: flex;">
+        <img style="margin: 40px; width: 80px; height: 80px"
+             src="{{ url_for('static', filename='images/Icon.png') }}">
+        <h1 style="font-size: 72px">БашMAX</h1>
+    </div>
+</header>
+<main>
+    {% for p in items%}
+    </div>
+            <div style="flex:1; padding:10px;">
+                <b>
+                    {{ highlight(p[4], searсh) }} | {{ highlight(p[2], search) }}<br>
+                    Описание товара: {{ highlight(p[5], search) }}<br>
+                    Производитель: {{highlight(p[6], search) }}<br>
+                    Поставшик: {{highlight(p[7], search)}}<br>
+                    Цена:
+                    {% if p[9] > 0 %}
+                    <span style="color: red; text-decoration: line-through">
+                        {{ highlight(p[8], search)}}
+                    </span>
+                    {{ p[8] * (1 - p[9]/100) }}
+                    {% else %}
+                    {{ p[8] }}
+                    {% endif %}<br>
+                    Единица измерения: {{p[3]}}<br>
+                    <p style="{{'color: blue' if p[10] == 0 else ''}}">Количество на складе: {{ highlight(p[10],
+                        search)}}</p>
+                </b>
+            </div>
+    </div>
+    {% endfor %}
+</main>
+
+</body>
+</html>

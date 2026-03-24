@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products</title>
+
+    {% macro highlight(text, search) %}
+    {% if search %}
+    {{ text | replace(search, '<span style="background-color: yellow;">' ~ search ~ '</span>') | safe }}
+    {% else %}
+    {{ text }}
+    {% endif %}
+    {% endmacro %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<header>
+    <div style="display: flex;">
+        <img style="margin: 40px; width: 80px; height: 80px"
+             src="{{ url_for('static', filename='images/Icon.png') }}">
+        <h1 style="font-size: 72px">БашMAX</h1>
+    </div>
+</header>
+<main>
+    <form method="post">
+        <input required name="artikul" placeholder="Артикул"><br>
+        <input required name="name" placeholder="Название"><br>
+        <input required name="unit" placeholder="Ед. изм."><br>
+        <input required name="category" placeholder="Категория"><br>
+        <textarea required name="description" placeholder="Описание"></textarea><br>
+        <input required name="manufacturer" placeholder="Производитель"><br>
+        <input required name="supplier" placeholder="Поставщик"><br>
+        <input required name="price" placeholder="Цена" type="number" step="0.01"><br>
+        <input required name="discount" placeholder="Скидка" type="number"><br>
+        <input required name="quantity" placeholder="Количество на складе" type="number"><br>
+        <button type="submit">Добавить</button>
+    </form>
+</main>
+
+</body>
+</html>

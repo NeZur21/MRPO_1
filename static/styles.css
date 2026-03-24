@@ -1,0 +1,64 @@
+input {
+    display: flex;
+    padding: 8px;
+    margin: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    justify-content:center;
+    align-items:center;
+    width: 300px;
+    height: 50px
+}
+
+input:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+textarea{
+    padding: 8px;
+    margin: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    justify-content:center;
+    align-items:center;
+    width: 300px
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    margin: 10px;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 150px
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .form-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .form-row label {
+        width: 120px; /* ширина подписи */
+        margin-right: 10px;
+        font-weight: bold;
+    }
+    .form-row input,
+    .form-row textarea {
+        flex: 1; /* поле занимает оставшееся место */
+    }

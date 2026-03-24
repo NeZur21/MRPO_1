@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Products</title>
+
+    {% macro highlight(text, search) %}
+    {% if search %}
+    {{ text | replace(search, '<span style="background-color: yellow;">' ~ search ~ '</span>') | safe }}
+    {% else %}
+    {{ text }}
+    {% endif %}
+    {% endmacro %}
+</head>
+
+
+<body style="font-family: Times New Roman;">
+
+<header>
+    <div style="display: flex;">
+        <img style="margin: 40px; width: 80px; height: 80px"
+             src="{{ url_for('static', filename='images/Icon.png') }}">
+        <h1 style="font-size: 72px">БашMAX</h1>
+    </div>
+    <div style="margin-top: -50px; text-align: right;">
+        <a href="/logout" style="margin: 10px;
+    font-size: 14px;
+    justify-content:right;
+    text-align: right;
+    width: 300px;">Logout</a>
+        <p style="margin: 10px">Имя: {{name}}</p>
+        <p style="margin: 10px">Роль: {{role}}</p>
+    </div>
+</header>
+<main>
+    {% if role == 'Администратор' or role == 'Менеджер' %}
+    <form method="get" style="margin-bottom:20px;">
+        <select style="margin: 10px" name="stock" onchange="this.form.submit()">
+            <option value="">Наличие</option>
+            <option value="in" {% if request.args.get(
+            'stock') == 'in' %}selected{% endif %}>В наличии</option>
+            <option value="out" {% if request.args.get(
+            'stock') == 'out' %}selected{% endif %}>Нет в наличии</option>
+        </select>
+
+        <select style="margin: 10px" name="quantity" onchange="this.form.submit()">
+            <option value="">Количество на складе</option>
+            <option value="asc" {% if request.args.get(
+            'quantity') == 'asc' %}selected{% endif %}>По возрастанию</option>
+            <option value="desc" {% if request.args.get(
+            'quantity') == 'desk' %}selected{% endif %}>По убыванию</option>
+        </select>
+
+        <select style="margin: 10px" name="supplier" onchange="this.form.submit()">
+            <option value="">Все поставщики</option>
+            {% for i in suppliers %}
+            <option value="{{ i }}" {% if request.args.get(
+            'supplier') == i %}selected{% endif %}>{{ i }}</option>
+            {% endfor %}
+        </select>
+
+        <input style='margin-left: 20px' type="text" name="search" placeholder="Поиск"
+               value="{{ request.args.get('search', '') }}">
+
+        {% if role == 'Администратор' %}
+        <a href="/add_product" style="
+    margin-left: 20px;
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+">
+            Добавить товар
+        </a>
+        {% endif %}
+    </form>
+    {% endif %}
+
+    {% if items %}
+    <div style="display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top:20px
+
+    ">
+
+        {% for p in items %}
+        <div style="
+    {% if p[9] > 15 %}
+                    background: #2E8B57;
+                {% endif %}
+    display:flex;
+    border:2px solid black;
+    border-radius: 15px">
+            {% if role == 'Администратор' %}
+            <form method="post" action="/delete_product/{{p[0]}}" style="display:inline;"
+                  onsubmit="return confirm('Вы уверены, что хотите удалить этот товар?');">
+                <button type="submit"
+                        style="background-color:red; border-radius: 15px; margin-top: 10px; margin-left: 10px; color:white; border:none; cursor:pointer;">
+                    X
+                </button>
+            </form>
+            {% endif %}
+            <div style="width:150px; justify-content:center; align-items:center;">
+                <img style="{{ 'margin: 20px' if p[11] else 'margin: 30px'}}"
+                     src="{{ url_for('static', filename='images/' ~ (p[11] if p[11] else 'picture.png')) }}"
+                     width="{{ '130' if p[11] else '100' }}">
+            </div>
+            <div style="flex:1; padding:10px;">
+                <b>
+                    {{ highlight(p[4], searсh) }} | {{ highlight(p[2], search) }}<br>
+                    Описание товара: {{ highlight(p[5], search) }}<br>
+                    Производитель: {{highlight(p[6], search) }}<br>
+                    Поставшик: {{highlight(p[7], search)}}<br>
+                    Цена:
+                    {% if p[9] > 0 %}
+                    <span style="color: red; text-decoration: line-through">
+                        {{ highlight(p[8], search)}}
+                    </span>
+                    {{ p[8] * (1 - p[9]/100) }}
+                    {% else %}
+                    {{ p[8] }}
+                    {% endif %}<br>
+                    Единица измерения: {{p[3]}}<br>
+                    <p style="{{'color: blue' if p[10] == 0 else ''}}">Количество на складе: {{ highlight(p[10],
+                        search)}}</p>
+                </b>
+            </div>
+            <div style="margin-right: -50px;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        text-align:center;
+        font-size:40px;
+        width: 200px;
+            ">
+                {{ p[9] }} %
+            </div>
+            <div>
+                {% if role == 'Администратор' %}
+                <a href="/edit_product/{{ p[0] }}" style="
+                    display: flex;
+                    background-color:#4CAF50;
+                    color:white;
+                    padding:10px 15px;
+                    text-decoration:none;
+                    cursor:pointer;
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    text-align:center;
+                    margin-left: -110px;
+                    margin-top: 15px;
+                    color: white;
+                    border: none;
+                    padding: 10px 15px;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    width: 100px
+                ">
+                    Редактировать
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No products found.</p>
+    {% endif %}
+
+
+</main>
+
+</body>
+</html>
